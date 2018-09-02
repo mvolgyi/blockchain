@@ -5,6 +5,11 @@ open_transactions = []
 owner = 'Matt'
 
 
+def hashs_block():
+    return  '-'.join([str(block[key]) for key in block])
+
+
+
 def get_last_blockchain_value():
     """ Returns the last value of the current blockchain """
     if len(blockchain) < 1:
@@ -32,7 +37,7 @@ def get_transaction_value():
 
 def mine_block():
     last_block = blockchain[-1]
-    hashed_block = '-'.join([str(last_block[key]) for key in last_block]) 
+    hashed_block = hashs_block(last_block)
     block = {'previous_hash': hashed_block, 'index': len(blockchain), 'transactions': open_transactions}
     blockchain.append(block)
 
@@ -50,7 +55,14 @@ def print_blockchain_elements():
 
 
 def verify_chain():
-    
+    """Verify the current blockchain and return True if it's valid, False if it's invalid"""
+    for (index, block) in enumerate(blockchain):
+        if index == 0:
+            continue
+        if block['previous_hash'] == hashs_block(blockchain[index - 1]):
+            return False
+    return True
+
 
 waitin_for_input = True
 
@@ -76,11 +88,11 @@ while waitin_for_input:
         waitin_for_input = False
     elif user_choice == 'h':
         if len(blockchain) >= 1:
-            blockchain[0] = [2]
+            blockchain[0] = {'previous_hash': '', 'index': 0, 'transactions': [{'sender': 'Max', 'recipient': 'Mat', 'amount': 100.0}]}
     else:
         print("Input was invalid, pleazse pick a value from the list!")
-    # if not verify_chain():
-    #     print_blockchain_elements()
+    if not verify_chain():
+        print_blockchain_elements()
         print("Invalid Blockchain!")
         break
 else:
